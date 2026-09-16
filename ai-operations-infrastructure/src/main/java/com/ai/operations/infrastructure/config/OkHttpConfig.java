@@ -18,6 +18,7 @@ public class OkHttpConfig {
                 .readTimeout(Duration.ofSeconds(30))
                 .writeTimeout(Duration.ofSeconds(30))
                 .connectionPool(new ConnectionPool(10, 5, TimeUnit.MINUTES))
+                .retryOnConnectionFailure(true)
                 .build();
     }
 }
