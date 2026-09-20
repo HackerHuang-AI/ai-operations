@@ -21,6 +21,12 @@ public class NacosConfig {
     @Value("${spring.cloud.nacos.config.group:${spring.application.name}}")
     private String group;
 
+    @Value("${spring.cloud.nacos.config.username:}")
+    private String username;
+
+    @Value("${spring.cloud.nacos.config.password:}")
+    private String password;
+
     private ConfigService configService;
 
     @PostConstruct
@@ -32,6 +38,10 @@ public class NacosConfig {
         try {
             Properties properties = new Properties();
             properties.put("serverAddr", serverAddr);
+            if (!username.isBlank()) {
+                properties.put("username", username);
+                properties.put("password", password);
+            }
             configService = NacosFactory.createConfigService(properties);
         } catch (NacosException e) {
             log.error("[NacosConfig] 创建 ConfigService 失败", e);
