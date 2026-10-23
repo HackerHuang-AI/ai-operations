@@ -22,6 +22,7 @@ public class TraceIdInterceptor implements HandlerInterceptor {
     private static final String SESSION_ID_HEADER = "X-Internal-Session-Id";
     private static final String CALL_CHAIN_HEADER = "X-Call-Chain";
     private static final String MDC_TRACE_ID = "traceId";
+    private static final String MDC_CALL_CHAIN = "callChain";
 
     private final String applicationName;
 
@@ -36,6 +37,7 @@ public class TraceIdInterceptor implements HandlerInterceptor {
         String traceparent = TraceContextSupport.childTraceparent(traceContext);
         response.setHeader(TRACEPARENT_HEADER, traceparent);
         String callChain = appendApplication(request.getHeader(CALL_CHAIN_HEADER));
+        MDC.put(MDC_CALL_CHAIN, TraceContextSupport.displayCallChain(callChain));
         if (TraceContextSupport.violatesCallChainPolicy(callChain)) {
             String previousTraceId = MDC.get(MDC_TRACE_ID);
             MDC.put(MDC_TRACE_ID, traceContext.traceId());
@@ -48,6 +50,7 @@ public class TraceIdInterceptor implements HandlerInterceptor {
                     MDC.put(MDC_TRACE_ID, previousTraceId);
                 }
             }
+            MDC.remove(MDC_CALL_CHAIN);
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             return false;
         }
@@ -63,6 +66,7 @@ public class TraceIdInterceptor implements HandlerInterceptor {
                                 @NonNull Object handler, Exception ex) {
         RequestContextHolder.clear();
         MDC.remove(MDC_TRACE_ID);
+        MDC.remove(MDC_CALL_CHAIN);
     }
 
     private String appendApplication(String callChain) {
