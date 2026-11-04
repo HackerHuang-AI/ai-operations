@@ -1,8 +1,8 @@
 package com.ai.operations.starter.config;
 
+import com.ai.operations.application.common.TraceContextSupport;
 import com.ai.operations.application.model.request.RequestContext;
 import com.ai.operations.application.model.request.RequestContextHolder;
-import com.ai.operations.application.common.TraceContextSupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -43,7 +43,7 @@ public class RestClientConfig {
     private void propagate(org.springframework.http.HttpRequest request, RequestContext context) {
         request.getHeaders().set(TRACEPARENT_HEADER, TraceContextSupport.childTraceparent(context.traceparent()));
         setHeader(request, USER_ID_HEADER, context.userId());
-        setHeader(request, TENANT_ID_HEADER, context.tenantId());
+        setHeader(request, TENANT_ID_HEADER, context.targetTenantId());
         setHeader(request, SESSION_ID_HEADER, context.sessionId());
         setHeader(request, CALL_CHAIN_HEADER, context.callChain());
     }

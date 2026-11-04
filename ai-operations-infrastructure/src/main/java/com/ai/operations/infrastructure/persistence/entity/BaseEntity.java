@@ -16,9 +16,9 @@ public abstract class BaseEntity {
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     /** 创建时间。 */
-    private LocalDateTime ctime;
+    private LocalDateTime createTime;
     /** 更新时间。 */
-    private LocalDateTime utime;
+    private LocalDateTime updateTime;
     /** 有效标识：1-有效，0-无效。 */
     @TableLogic(value = "1", delval = "0")
     private Integer valid;

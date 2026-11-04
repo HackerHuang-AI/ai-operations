@@ -4,7 +4,7 @@ public record RequestContext(
         String traceId,
         String traceparent,
         String userId,
-        String tenantId,
+        String targetTenantId,
         String sessionId,
         String callChain
 ) {

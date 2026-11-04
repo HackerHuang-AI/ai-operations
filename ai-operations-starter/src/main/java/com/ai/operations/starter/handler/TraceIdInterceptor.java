@@ -1,8 +1,8 @@
 package com.ai.operations.starter.handler;
 
+import com.ai.operations.application.common.TraceContextSupport;
 import com.ai.operations.application.model.request.RequestContext;
 import com.ai.operations.application.model.request.RequestContextHolder;
-import com.ai.operations.application.common.TraceContextSupport;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class TraceIdInterceptor implements HandlerInterceptor {
     private static final String TRACEPARENT_HEADER = "traceparent";
     private static final String USER_ID_HEADER = "X-Internal-User-Id";
-    private static final String TENANT_ID_HEADER = "X-Internal-Tenant-Id";
     private static final String SESSION_ID_HEADER = "X-Internal-Session-Id";
     private static final String CALL_CHAIN_HEADER = "X-Call-Chain";
     private static final String MDC_TRACE_ID = "traceId";
@@ -55,7 +54,7 @@ public class TraceIdInterceptor implements HandlerInterceptor {
             return false;
         }
         RequestContextHolder.set(new RequestContext(traceContext.traceId(), traceparent,
-                request.getHeader(USER_ID_HEADER), request.getHeader(TENANT_ID_HEADER),
+                request.getHeader(USER_ID_HEADER), null,
                 request.getHeader(SESSION_ID_HEADER), callChain));
         MDC.put(MDC_TRACE_ID, traceContext.traceId());
         return true;

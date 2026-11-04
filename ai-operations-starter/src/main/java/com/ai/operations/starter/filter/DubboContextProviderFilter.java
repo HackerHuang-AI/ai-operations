@@ -1,8 +1,8 @@
 package com.ai.operations.starter.filter;
 
+import com.ai.operations.application.common.TraceContextSupport;
 import com.ai.operations.application.model.request.RequestContext;
 import com.ai.operations.application.model.request.RequestContextHolder;
-import com.ai.operations.application.common.TraceContextSupport;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.*;
 import org.apache.dubbo.rpc.model.ApplicationModel;
@@ -27,7 +27,7 @@ public class DubboContextProviderFilter implements Filter {
         String traceparent = TraceContextSupport.childTraceparent(traceContext);
         RequestContextHolder.set(new RequestContext(traceContext.traceId(), traceparent,
                 invocation.getAttachment(DubboContextConsumerFilter.USER_ID),
-                invocation.getAttachment(DubboContextConsumerFilter.TENANT_ID),
+                null,
                 invocation.getAttachment(DubboContextConsumerFilter.SESSION_ID), callChain));
         MDC.put(TRACE_ID, traceContext.traceId());
         MDC.put(CALL_CHAIN, TraceContextSupport.displayCallChain(callChain));

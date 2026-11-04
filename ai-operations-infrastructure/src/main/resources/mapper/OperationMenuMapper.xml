@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ai.operations.infrastructure.persistence.mapper.OperationMenuMapper">
+    <select id="selectUserMenus" resultType="com.ai.operations.infrastructure.persistence.dto.OperationMenuRow">
+        SELECT m.id, m.parent_menu_id AS parentId, m.menu_code AS menuCode,
+               m.menu_name AS resourceName, m.`desc`, m.resource_type AS resourceType,
+               m.route_path AS routePath, m.icon, m.sort_no AS sortNo,
+               EXISTS (
+                   SELECT 1
+                   FROM operation_user u
+                   INNER JOIN operation_user_role ur ON ur.user_id = u.user_id
+                   INNER JOIN operation_role r ON r.id = ur.operation_role_id
+                   INNER JOIN operation_role_menu rm ON rm.operation_role_id = r.id
+                   INNER JOIN operation_menu granted ON granted.id = rm.operation_menu_id
+                   WHERE u.user_id = #{userId} AND u.status = 1 AND u.valid = 1
+                     AND ur.valid = 1 AND ur.effective_start_time &lt;= CURRENT_TIMESTAMP
+                     AND (ur.effective_end_time IS NULL OR ur.effective_end_time &gt; CURRENT_TIMESTAMP)
+                     AND r.status = 1 AND r.valid = 1 AND rm.valid = 1
+                     AND granted.status = 1 AND granted.valid = 1 AND granted.resource_type IN (1, 2)
+                     AND (granted.id = m.id OR (rm.include_descendants = 1
+                         AND LEFT(m.men_path, CHAR_LENGTH(granted.men_path) + 1) = CONCAT(granted.men_path, ';')))
+               ) AS authorized
+        FROM operation_menu m
+        WHERE m.status = 1 AND m.valid = 1 AND m.resource_type IN (1, 2)
+        ORDER BY m.sort_no, m.id
+    </select>
+</mapper>
+

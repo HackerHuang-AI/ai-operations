@@ -1,8 +1,8 @@
 package com.ai.operations.starter.filter;
 
+import com.ai.operations.application.common.TraceContextSupport;
 import com.ai.operations.application.model.request.RequestContext;
 import com.ai.operations.application.model.request.RequestContextHolder;
-import com.ai.operations.application.common.TraceContextSupport;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Filter;
 import org.apache.dubbo.rpc.Invocation;
@@ -26,7 +26,7 @@ public class DubboContextConsumerFilter implements Filter {
     private void propagate(Invocation invocation, RequestContext context) {
         invocation.setAttachment(TRACEPARENT, TraceContextSupport.childTraceparent(context.traceparent()));
         setAttachment(invocation, USER_ID, context.userId());
-        setAttachment(invocation, TENANT_ID, context.tenantId());
+        setAttachment(invocation, TENANT_ID, context.targetTenantId());
         setAttachment(invocation, SESSION_ID, context.sessionId());
         setAttachment(invocation, CALL_CHAIN, context.callChain());
     }
