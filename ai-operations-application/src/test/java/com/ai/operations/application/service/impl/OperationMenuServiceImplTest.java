@@ -1,8 +1,8 @@
 package com.ai.operations.application.service.impl;
 
 import com.ai.operations.application.bo.OperationMenuBO;
-import com.ai.operations.infrastructure.persistence.dto.OperationMenuRow;
-import com.ai.operations.infrastructure.persistence.mapper.OperationMenuMapper;
+import com.ai.operations.application.model.OperationMenuRowBO;
+import com.ai.operations.application.port.OperationMenuQueryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,13 +13,13 @@ import static org.mockito.Mockito.*;
 
 class OperationMenuServiceImplTest {
     private static final String USER_ID = "ops-user-1";
-    private OperationMenuMapper mapper;
+    private OperationMenuQueryPort menuQueryPort;
     private OperationMenuServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        mapper = mock(OperationMenuMapper.class);
-        service = new OperationMenuServiceImpl(mapper);
+        menuQueryPort = mock(OperationMenuQueryPort.class);
+        service = new OperationMenuServiceImpl(menuQueryPort);
     }
 
     @Test
@@ -27,8 +27,8 @@ class OperationMenuServiceImplTest {
         menus(row(1, null, "ROOT", 1, false, 0), row(2, 1L, "HOME", 2, false, 1));
 
         assertThat(service.tree(USER_ID)).isEmpty();
-        verify(mapper).selectUserMenus(USER_ID);
-        verifyNoMoreInteractions(mapper);
+        verify(menuQueryPort).selectUserMenus(USER_ID);
+        verifyNoMoreInteractions(menuQueryPort);
     }
 
     @Test
@@ -52,7 +52,7 @@ class OperationMenuServiceImplTest {
 
     @Test
     void rootDescendantGrantsExpandRootAndRemoveEmptyDirectories() {
-        OperationMenuRow profile = row(3, 2L, "PROFILE", 2, true, 1);
+        OperationMenuRowBO profile = row(3, 2L, "PROFILE", 2, true, 1);
         profile.setDesc(null);
         menus(row(1, null, "ROOT", 1, true, 0), row(2, 1L, "HOME", 2, true, 1),
                 profile, row(4, 1L, "ADMIN", 1, true, 2),
@@ -124,12 +124,12 @@ class OperationMenuServiceImplTest {
                 .containsExactly("FIRST", "SECOND", "THIRD");
     }
 
-    private void menus(OperationMenuRow... rows) {
-        when(mapper.selectUserMenus(USER_ID)).thenReturn(List.of(rows));
+    private void menus(OperationMenuRowBO... rows) {
+        when(menuQueryPort.selectUserMenus(USER_ID)).thenReturn(List.of(rows));
     }
 
-    private OperationMenuRow row(long id, Long parentId, String code, int type, boolean authorized, int sortNo) {
-        OperationMenuRow row = new OperationMenuRow();
+    private OperationMenuRowBO row(long id, Long parentId, String code, int type, boolean authorized, int sortNo) {
+        OperationMenuRowBO row = new OperationMenuRowBO();
         row.setId(id);
         row.setParentId(parentId);
         row.setMenuCode(code);

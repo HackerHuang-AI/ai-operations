@@ -11,6 +11,12 @@
     <name>ai-operations-infrastructure</name>
     <description>基础设施层：Nacos、OkHttp、重试与线程池</description>
     <dependencies>
+        <!-- 依赖倒置：实现 application 定义的端口接口（SessionStore / SmsCodeStore 等） -->
+        <dependency>
+            <groupId>com.ai.operations</groupId>
+            <artifactId>ai-operations-application</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>

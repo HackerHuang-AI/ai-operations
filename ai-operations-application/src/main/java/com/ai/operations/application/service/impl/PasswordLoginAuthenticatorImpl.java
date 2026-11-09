@@ -7,12 +7,10 @@ import com.ai.operations.application.common.BizException;
 import com.ai.operations.application.enums.ErrorCodeEnum;
 import com.ai.operations.application.enums.IdentityProviderEnum;
 import com.ai.operations.application.enums.IdentityTypeEnum;
+import com.ai.operations.application.model.OperationUserBO;
+import com.ai.operations.application.port.OperationUserIdentityPort;
+import com.ai.operations.application.port.OperationUserPort;
 import com.ai.operations.application.service.LoginAuthenticator;
-import com.ai.operations.infrastructure.persistence.entity.OperationUserEntity;
-import com.ai.operations.infrastructure.persistence.entity.OperationUserIdentityEntity;
-import com.ai.operations.infrastructure.persistence.mapper.OperationUserIdentityMapper;
-import com.ai.operations.infrastructure.persistence.mapper.OperationUserMapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -22,13 +20,13 @@ import java.util.List;
 
 @Component
 public class PasswordLoginAuthenticatorImpl implements LoginAuthenticator {
-    private final OperationUserIdentityMapper identityMapper;
-    private final OperationUserMapper userMapper;
+    private final OperationUserIdentityPort identityPort;
+    private final OperationUserPort userPort;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public PasswordLoginAuthenticatorImpl(OperationUserIdentityMapper identityMapper, OperationUserMapper userMapper) {
-        this.identityMapper = identityMapper;
-        this.userMapper = userMapper;
+    public PasswordLoginAuthenticatorImpl(OperationUserIdentityPort identityPort, OperationUserPort userPort) {
+        this.identityPort = identityPort;
+        this.userPort = userPort;
     }
 
     @Override
@@ -48,26 +46,19 @@ public class PasswordLoginAuthenticatorImpl implements LoginAuthenticator {
         if (!errors.isEmpty()) {
             throw new BizException(ErrorCodeEnum.REQUEST_VALIDATION_FAILED, errors);
         }
-        OperationUserIdentityEntity identity = identityMapper.selectOne(new LambdaQueryWrapper<OperationUserIdentityEntity>()
-                .eq(OperationUserIdentityEntity::getIdentityType, IdentityTypeEnum.ACCOUNT.getValue())
-                .eq(OperationUserIdentityEntity::getIdentityProvider, IdentityProviderEnum.LOCAL.getValue())
-                .eq(OperationUserIdentityEntity::getIdentityValue, command.getAccount()));
-        if (identity == null) {
-            throw new BizException(ErrorCodeEnum.LOGIN_FAILED);
-        }
-        OperationUserEntity user = userMapper.selectOne(new LambdaQueryWrapper<OperationUserEntity>()
-                .eq(OperationUserEntity::getUserId, identity.getUserId())
-                .eq(OperationUserEntity::getStatus, 1));
-        if (user == null || user.getPasswordHash() == null
-                || !passwordEncoder.matches(command.getPassword(), user.getPasswordHash())) {
+        String userId = identityPort.findUserIdByIdentity(IdentityTypeEnum.ACCOUNT.getValue(),
+                IdentityProviderEnum.LOCAL.getValue(), command.getAccount())
+                .orElseThrow(() -> new BizException(ErrorCodeEnum.LOGIN_FAILED));
+        OperationUserBO user = userPort.findActiveByUserId(userId)
+                .orElseThrow(() -> new BizException(ErrorCodeEnum.LOGIN_FAILED));
+        if (user.passwordHash() == null || !passwordEncoder.matches(command.getPassword(), user.passwordHash())) {
             throw new BizException(ErrorCodeEnum.LOGIN_FAILED);
         }
         AuthenticatedIdentity authenticated = new AuthenticatedIdentity();
-        authenticated.setUserId(identity.getUserId());
+        authenticated.setUserId(userId);
         authenticated.setIdentityType(IdentityTypeEnum.ACCOUNT.getValue());
         authenticated.setIdentityProvider(IdentityProviderEnum.LOCAL.getValue());
         authenticated.setIdentityValue(command.getAccount());
         return authenticated;
     }
 }
-
