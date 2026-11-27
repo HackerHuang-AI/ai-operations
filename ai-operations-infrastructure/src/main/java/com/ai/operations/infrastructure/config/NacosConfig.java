@@ -1,6 +1,6 @@
 package com.ai.operations.infrastructure.config;
 
-import com.ai.operations.infrastructure.enums.NacosDataIdEnum;
+import com.ai.operations.application.enums.NacosDataIdEnum;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;

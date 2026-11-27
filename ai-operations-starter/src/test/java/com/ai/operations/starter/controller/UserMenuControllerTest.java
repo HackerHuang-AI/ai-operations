@@ -90,13 +90,13 @@ class UserMenuControllerTest {
     }
 
     @Test
-    void missingContextOrUserIsRejectedBeforeQuery() {
+    void missingContextOrUserPropagatesIllegalStateBeforeQuery() {
         RequestContextHolder.clear();
-        rejected();
+        noCurrentUser();
         context(null);
-        rejected();
+        noCurrentUser();
         context("  ");
-        rejected();
+        noCurrentUser();
         verifyNoInteractions(service);
     }
 
@@ -109,15 +109,16 @@ class UserMenuControllerTest {
     }
 
     @Test
-    void unexpectedFailureIsMappedToSystemError() {
+    void unexpectedFailurePropagatesToHandler() {
         when(service.tree(USER_ID)).thenThrow(new IllegalStateException("query failed"));
 
-        rejected();
+        assertThatThrownBy(controller::tree).isInstanceOf(IllegalStateException.class)
+                .hasMessage("query failed");
     }
 
-    private void rejected() {
-        assertThatThrownBy(controller::tree).isInstanceOfSatisfying(BizException.class,
-                e -> assertThat(e.getErrorCode()).isEqualTo(ErrorCodeEnum.SYSTEM_ERROR));
+    private void noCurrentUser() {
+        assertThatThrownBy(controller::tree).isInstanceOf(IllegalStateException.class)
+                .hasMessage("current user is unavailable");
     }
 
     private void context(String userId) {

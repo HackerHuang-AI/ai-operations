@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS `ai_operations` DEFAULT CHARACTER SET utf8mb4 COLL
 USE `ai_operations`;
 
 # 模块接口注册表 各模块维护自己的接口
-CREATE TABLE `api_interface` (
+CREATE TABLE `api_interface_template` (
     `id` BIGINT UNSIGNED NOT NULL COMMENT '接口注册主键 ID',
     `module_name` VARCHAR(128) NOT NULL COMMENT '模块应用名 取 spring.application.name',
     `http_method` VARCHAR(16) NOT NULL COMMENT 'HTTP 请求方法',
@@ -13,11 +13,11 @@ CREATE TABLE `api_interface` (
     `valid` TINYINT NOT NULL DEFAULT 1 COMMENT '有效标识 1-有效 0-无效',
     `version` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '乐观锁版本',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_api_interface_module_method_path` (`module_name`, `http_method`, `path`)
+    UNIQUE KEY `uk_api_interface_template_module_method_path` (`module_name`, `http_method`, `path`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='模块接口注册表';
 
 # ai-operations 前端 HTTP 接口初始化
-INSERT INTO `api_interface` (`id`, `module_name`, `http_method`, `path`, `description`) VALUES
+INSERT INTO `api_interface_template` (`id`, `module_name`, `http_method`, `path`, `description`) VALUES
 (1, 'ai-operations', 'POST', '/api/access/login', '运营人员登录，返回运营会话令牌、会话 ID 及用户 ID'),
 (2, 'ai-operations', 'GET', '/api/access/sessions', '查询当前运营用户登录会话列表'),
 (3, 'ai-operations', 'POST', '/api/access/logout', '退出当前运营登录会话'),

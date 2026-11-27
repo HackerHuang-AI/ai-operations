@@ -28,5 +28,17 @@ public class Result<T> {
     public static <T> Result<T> error(ErrorCodeEnum errorCode, String message, List<ErrorItem> errors) {
         return new Result<>(ResultCodeEnum.ERROR, message, errorCode.getCode(), null, List.copyOf(errors));
     }
-}
 
+    /** 成功，携带数据与自定义提示。 */
+    public static <T> Result<T> success(String message, T data) {
+        return new Result<>(ResultCodeEnum.SUCCESS, message, null, data, null);
+    }
+    /** 成功，无数据。 */
+    public static <T> Result<T> success() {
+        return new Result<>(ResultCodeEnum.SUCCESS, ResultCodeEnum.SUCCESS.getDefaultMessage(), null, null, null);
+    }
+    /** 失败，仅携带错误码与提示。 */
+    public static <T> Result<T> error(ErrorCodeEnum errorCode, String message) {
+        return error(errorCode, message, List.of());
+    }
+}

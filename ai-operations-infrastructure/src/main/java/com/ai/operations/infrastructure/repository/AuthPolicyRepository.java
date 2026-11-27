@@ -3,7 +3,7 @@ package com.ai.operations.infrastructure.repository;
 import com.ai.operations.application.config.OperationsAuthConfig;
 import com.ai.operations.application.port.AuthPolicyPort;
 import com.ai.operations.infrastructure.config.NacosConfig;
-import com.ai.operations.infrastructure.enums.NacosDataIdEnum;
+import com.ai.operations.application.enums.NacosDataIdEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

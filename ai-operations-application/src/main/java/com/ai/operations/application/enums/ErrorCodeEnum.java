@@ -9,6 +9,7 @@ public enum ErrorCodeEnum {
     PARAMETER_FORMAT_INVALID("3001004", "error.3001004", "参数格式不合法"),
     PARAMETER_OUT_OF_RANGE("3001005", "error.3001005", "参数超出允许范围"),
     PARAMETER_VALUE_INVALID("3001006", "error.3001006", "参数值不合法"),
+    PARAM_ILLEGAL("3001007", "error.3001007", "参数不合法"),
     SYSTEM_ERROR("3001999", "error.3001999", "系统异常，请稍后重试"),
     LOGIN_FAILED("3101001", "error.3101001", "账号或密码错误"),
     SMS_CODE_INVALID("3101002", "error.3101002", "验证码错误或已过期"),

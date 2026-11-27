@@ -1,4 +1,4 @@
-package com.ai.operations.infrastructure.enums;
+package com.ai.operations.application.enums;
 
 /**
  * Nacos 业务配置 DataId。

@@ -18,7 +18,8 @@ public class OkHttpConfig {
                 .readTimeout(Duration.ofSeconds(30))
                 .writeTimeout(Duration.ofSeconds(30))
                 .connectionPool(new ConnectionPool(10, 5, TimeUnit.MINUTES))
-                .retryOnConnectionFailure(true)
+                // 关闭 OkHttp 内建静默重试：重试统一由 RetryUtil 按 RetryParam 控制，避免两层重试相乘
+                .retryOnConnectionFailure(false)
                 .build();
     }
 }
